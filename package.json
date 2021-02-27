@@ -8,7 +8,7 @@
   "private": true,
   "scripts": {
     "build": "node ./builder.js",
-    "dev": "concurrently -k \"serve ./build\" \"nodemon -e ejs,json --watch src ./builder.js\""
+    "dev": "NODE_ENV=development concurrently -k \"serve ./build\" \"nodemon -e ejs,json --watch src ./builder.js\""
   },
   "dependencies": {
     "csv-parser": "^3.0.0",
