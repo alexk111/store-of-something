@@ -1,5 +1,6 @@
 const { promisify } = require("util");
 
+const csv = require("csv-parser");
 const ejs = require("ejs");
 const fse = require("fs-extra");
 const promGlob = promisify(require("glob"));
@@ -11,18 +12,43 @@ const pathBuild = "./build";
 const something = require(`${pathSrc}/data/something.json`);
 const prices = {};
 
+async function loadPricesFromCSV(filePath) {
+  return new Promise((resolve, reject) => {
+    fse
+      .createReadStream(filePath)
+      .pipe(csv({}))
+      .on("data", (data) => {
+        const strDate = data["date"]; // YYYY-MM-DD
+        const arrDate = strDate.split("-");
+        if (arrDate.length !== 3) {
+          throw new Error(
+            `Invalid Date "${strDate}". Dates should be in "YYYY-MM-DD" format.`
+          );
+        }
+        if (arrDate[0] * 1 >= 2010) {
+          const strCategory = data["name"];
+          const strPrice = data["dollar_price"];
+          prices[strCategory] = prices[strCategory] || {};
+          prices[strCategory][strDate] = (strPrice * 1).toFixed(2) * 1;
+        }
+      })
+      .on("end", () => {
+        resolve();
+      })
+      .on("error", (err) => {
+        reject(err);
+      });
+  });
+}
 async function loadPrices() {
   // Get price files
-  const jsonPaths = await promGlob("**/*.json", {
-    cwd: `${pathSrc}/data/prices`,
+  const csvPaths = await promGlob("**/*.csv", {
+    cwd: `${pathSrc}/data`,
   });
 
   // Load prices
-  for (const jsonPath of jsonPaths) {
-    const pricesForLocation = require(`${pathSrc}/data/prices/${jsonPath}`);
-    const jsonPathData = path.parse(jsonPath);
-    const locationName = pricesForLocation.location || jsonPathData.name;
-    prices[locationName] = pricesForLocation.prices;
+  for (const csvPath of csvPaths) {
+    await loadPricesFromCSV(`${pathSrc}/data/${csvPath}`);
   }
 }
 
