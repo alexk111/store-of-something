@@ -44,9 +44,9 @@ async function loadThingPricesFromCSV(filePath) {
         const strDate = data["date"];
         const arrDate = strDateToArr(strDate);
 
-        if (arrDate[0] * 1 >= 2010) {
-          const strCategory = data["name"];
-          const strPrice = data["dollar_price"];
+        if (arrDate[0] * 1 >= something.fromYear) {
+          const strCategory = data[something.csvColumnNames.category];
+          const strPrice = data[something.csvColumnNames.usdPrice];
           if (thingPrices[strCategory] === undefined) {
             thingPrices[strCategory] = {};
           }
@@ -138,8 +138,10 @@ async function loadBitcoinPricesFromRemoteAPI(vsCurrency) {
 
 async function loadBitcoinPrices() {
   await loadBitcoinPricesFromRemoteAPI("usd");
-  await loadBitcoinPricesFromRemoteAPI("xau");
-  await loadBitcoinPricesFromRemoteAPI("xag");
+  for (const storeId in something.stores) {
+    await loadBitcoinPricesFromRemoteAPI(storeId);
+    await loadBitcoinPricesFromRemoteAPI(storeId);
+  }
 }
 
 function calculateStorePrices() {

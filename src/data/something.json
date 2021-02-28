@@ -1,5 +1,18 @@
 {
   "singular": "Big Mac",
   "plural": "Big Macs",
-  "icon": "🍔"
+  "icon": "🍔",
+  "fromYear": 2013,
+  "categoryName": {
+    "singular": "Country",
+    "plural": "Countries"
+  },
+  "csvColumnNames": {
+    "category": "name",
+    "usdPrice": "dollar_price"
+  },
+  "stores": {
+    "xag": "Silver",
+    "xau": "Gold"
+  }
 }
