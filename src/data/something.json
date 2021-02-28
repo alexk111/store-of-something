@@ -12,7 +12,7 @@
     "usdPrice": "dollar_price"
   },
   "stores": {
-    "xag": "Silver",
-    "xau": "Gold"
+    "xau": "Gold",
+    "xag": "Silver"
   }
 }

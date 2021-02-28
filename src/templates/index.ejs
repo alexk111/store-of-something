@@ -3,6 +3,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title><%= something.icon; %> | Store of <%= something.plural; %></title>
 <style>
+  .bitcoin_color {
+    color: #FF9900;
+  }
   .icon {
     font-size: 128px;
     line-height: 1;
@@ -19,35 +22,50 @@
     font-size:40px;
     font-weight:800;
   }
-  .pickers, .pickers select {
+  .main, .main select {
     font-size: 24px;
+    line-height: 3;
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
-  .pickers select {
+  .main select {
     font-weight:800;
   }
   select {
-    border:4px solid #000;
+    border:4px solid #5c9e31;
+    color: #5c9e31;
     cursor:pointer;
-    opacity:0.7;
+    opacity:0.8;
+  }
+  select.bitcoin_color {
+    color: #FF9900;
+    border-color: #FF9900;
   }
   select:hover {
     opacity:1;
   }
   a {
-    color:#d22f27;
+    color:#5c9e31;
+    opacity:0.8;
+  }
+  a:hover {
+    opacity:1;
+  }
+  .chart {
+    margin: 32px 0;
   }
 </style>
 </head>
 
 <body>
-<p class="icon"><%= something.icon; %></p>
-<h1>Store of <%= something.plural; %></h1>
+<header>
+  <p class="icon"><%= something.icon; %></p>
+  <h1>Store of <%= something.plural; %></h1>
+</header>
 
-<section class="pickers">
-  Monetary value of a <b><%= something.singular; %></b> in
+<section class="main">
+  Monetary value of <b>1 <%= something.singular; %></b> in
 
-  <select class="sel_category" style="color:#5c9e31;border-color:#5c9e31;">
+  <select class="sel_category">
     <% Object.getOwnPropertyNames(thingPrices).sort().forEach((category) => { %>
     <option value="<%= category %>"><%= category %></option>
     <% }) %>
@@ -55,13 +73,29 @@
 
   in
 
-  <select class="sel_year" style="color:#d22f27;border-color:#d22f27;">
+  <select class="sel_year">
     <% for (let year = something.fromYear; year <= (new Date()).getFullYear(); year++) { %>
     <option value="<%= year %>"><%= year %></option>
     <% } %>
   </select>
 
-  <b>stored in Bitcoin</b>
+  <b>stored in</b>
+
+  <select class="sel_curr bitcoin_color">
+    <option value="btc">Bitcoin</option>
+    <option value="usd">USD</option>
+    <% Object.getOwnPropertyNames(something.stores).forEach((curr) => { %>
+      <option value="<%= curr %>"><%= something.stores[curr] %></option>
+    <% }) %>
+  </select>
+
+  <br />
+
+  now equals to <b><span class="thing_qty"></span> <%= something.plural; %></b>
+</section>
+
+<section class="chart">
+	<canvas id="chart" width="500" height="400"></canvas>
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha256-t9UJPrESBeG2ojKTIcFLPGF7nHi2vEc7f5A2KpH/UBU=" crossorigin="anonymous"></script>
@@ -71,6 +105,9 @@
 <%- `<script>var storePrices=${JSON.stringify(storePrices)};</script>`; %>
 
 <script>
+  /**
+   * INIT DATA
+   */
   var arrThingTimePrice = {};
   var arrStoreTimePrice = {};
 
@@ -84,6 +121,9 @@
         }
       }
     }
+    arrThingTimePrice[category] = new Map([...arrThingTimePrice[category].entries()].sort(function(v1,v2) {
+      return v1[0] - v2[0];
+    }));
   }
   for (var curr in storePrices) {
     arrStoreTimePrice[curr] = new Map();
@@ -95,8 +135,94 @@
         }
       }
     }
+    arrStoreTimePrice[curr] = new Map([...arrStoreTimePrice[curr].entries()].sort(function(v1,v2) {
+      return v1[0] - v2[0];
+    }));
+  }
+
+  /**
+   * INIT CHART
+   */
+  var ctx = document.getElementById('chart').getContext('2d');
+  var chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+    },
+    options: {
+      elements: {
+        point: {
+          radius: 0
+        },
+        line: {
+          tension: 0.1
+        }
+      },
+      animation: false,
+      responsive: true,
+      maintainAspectRatio: false,
+      legend: {
+        display: false
+      },
+    }
+  });
+
+  var selCategory='';
+	var selYear='';
+  var selCurr='';
+	$(function () {
+		$('.sel_category').on('change', function() {
+      updateChart();
+    });
+		$('.sel_year').on('change', function() {
+      updateChart();
+    });
+		$('.sel_curr').on('change', function() {
+      updateChart();
+      updateSelCurr();
+    });
+
+		updateChart();
+    updateSelCurr();
+	});
+
+  /**
+   * FUNCTIONS
+   */
+  function timestampToYYYYMMDD(ts) {
+    return new Date(ts).toISOString().slice(0,10);
+  }
+  function updateSelCurr() {
+    if (selCurr==='btc') {
+      $('.sel_curr').addClass('bitcoin_color');
+    } else {
+      $('.sel_curr').removeClass('bitcoin_color');
+    }
+  }
+
+  function updateChart() {
+    selCategory=$('.sel_category').val();
+		selYear=$('.sel_year').val();
+    selCurr=$('.sel_curr').val();
+
+    const data = {
+      labels: [],
+      datasets: []
+    };
+
+    // for (var [key, value] of arrStoreTimePrice['btc']) {
+    //   if (!arrStoreTimePrice['xau'].has(key)) {
+    //     console.log(key + ' = ' + value);
+    //   }
+    // }
+
+
+    chart.data = data;
+		chart.update();
   }
 </script>
 
+<p>
+  Updated on <%= new Date().toISOString().slice(0,10); %>
+</p>
 </body>
 </html>
