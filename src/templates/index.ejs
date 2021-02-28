@@ -1,10 +1,102 @@
 <html>
-  <head></head>
-  <body>
-    <h1><%= something.icon; %></h1>
-    <h2>Store of <%= something.plural; %></h2>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title><%= something.icon; %> | Store of <%= something.plural; %></title>
+<style>
+  .icon {
+    font-size: 128px;
+    line-height: 1;
+    margin:0;
+    position: relative;
+  }
+  body {
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding:32px;
+    text-align:center;
+  }
+  h1 {
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size:40px;
+    font-weight:800;
+  }
+  .pickers, .pickers select {
+    font-size: 24px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  .pickers select {
+    font-weight:800;
+  }
+  select {
+    border:4px solid #000;
+    cursor:pointer;
+    opacity:0.7;
+  }
+  select:hover {
+    opacity:1;
+  }
+  a {
+    color:#d22f27;
+  }
+</style>
+</head>
 
-    <%- `<script>var thingPrices=${JSON.stringify(thingPrices)};</script>`; %>
-    <%- `<script>var storePrices=${JSON.stringify(storePrices)};</script>`; %>
-  </body>
+<body>
+<p class="icon"><%= something.icon; %></p>
+<h1>Store of <%= something.plural; %></h1>
+
+<section class="pickers">
+  Monetary value of a <b><%= something.singular; %></b> in
+
+  <select class="sel_category" style="color:#5c9e31;border-color:#5c9e31;">
+    <% Object.getOwnPropertyNames(thingPrices).sort().forEach((category) => { %>
+    <option value="<%= category %>"><%= category %></option>
+    <% }) %>
+  </select>
+
+  in
+
+  <select class="sel_year" style="color:#d22f27;border-color:#d22f27;">
+    <% for (let year = something.fromYear; year <= (new Date()).getFullYear(); year++) { %>
+    <option value="<%= year %>"><%= year %></option>
+    <% } %>
+  </select>
+
+  <b>stored in Bitcoin</b>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha256-t9UJPrESBeG2ojKTIcFLPGF7nHi2vEc7f5A2KpH/UBU=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
+<%- `<script>var thingPrices=${JSON.stringify(thingPrices)};</script>`; %>
+<%- `<script>var storePrices=${JSON.stringify(storePrices)};</script>`; %>
+
+<script>
+  var arrThingTimePrice = {};
+  var arrStoreTimePrice = {};
+
+  for (var category in thingPrices) {
+    arrThingTimePrice[category] = new Map();
+    for (var year in thingPrices[category]) {
+      for (var month in thingPrices[category][year]) {
+        for (var date in thingPrices[category][year][month]) {
+          var d = new Date(year, month-1, date, 0,0,0,0);
+          arrThingTimePrice[category].set(d.getTime(), thingPrices[category][year][month][date]);
+        }
+      }
+    }
+  }
+  for (var curr in storePrices) {
+    arrStoreTimePrice[curr] = new Map();
+    for (var year in storePrices[curr]) {
+      for (var month in storePrices[curr][year]) {
+        for (var date in storePrices[curr][year][month]) {
+          var d = new Date(year, month-1, date, 0,0,0,0);
+          arrStoreTimePrice[curr].set(d.getTime(), storePrices[curr][year][month][date]);
+        }
+      }
+    }
+  }
+</script>
+
+</body>
 </html>
