@@ -24,11 +24,17 @@
   }
   .main, .main select {
     font-size: 24px;
-    line-height: 3;
+    line-height: 2;
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
   .main select {
     font-weight:800;
+  }
+  .main-block {
+    margin: 12px 0;
+  }
+  .inline-block {
+    display: inline-block;
   }
   select {
     border:4px solid #5c9e31;
@@ -57,6 +63,19 @@
   .chart {
     margin: 32px 0;
   }
+
+  @media (max-width: 600px) {
+		body {
+			padding:0;
+		}
+		.chart,
+		#chart {
+			height:50vh;
+		}
+    .main-block {
+      margin: 16px 0;
+    }
+	}
 </style>
 </head>
 
@@ -67,35 +86,49 @@
 </header>
 
 <section class="main">
-  Monetary value of <b>1 <%= something.singular; %></b> in
+  <div class="main-block">
+    <span class="inline-block">Monetary value of</span>
 
-  <select class="sel_category">
-    <% Object.getOwnPropertyNames(thingPrices).sort().forEach((category) => { %>
-    <option value="<%= category %>"><%= category %></option>
-    <% }) %>
-  </select>
+    <span class="inline-block"><b>1 <%= something.singular; %></b></span>
 
-  in
+    <span class="inline-block">
+      in
+      <select class="sel_category">
+        <% Object.getOwnPropertyNames(thingPrices).sort().forEach((category) => { %>
+        <option value="<%= category %>"><%= category %></option>
+        <% }) %>
+      </select>
+    </span>
 
-  <select class="sel_year">
-    <% for (let year = something.fromYear; year < (new Date()).getUTCFullYear(); year++) { %>
-    <option value="<%= year %>"><%= year %></option>
-    <% } %>
-  </select>
+    <span class="inline-block">
+      in
+      <select class="sel_year">
+        <% for (let year = something.fromYear; year < (new Date()).getUTCFullYear(); year++) { %>
+        <option value="<%= year %>"><%= year %></option>
+        <% } %>
+      </select>
+    </span>
 
-  stored in
+    <span class="inline-block">
+      stored in
+      <select class="sel_curr bitcoin_color">
+        <option value="btc">Bitcoin</option>
+        <option value="usd">USD</option>
+        <% Object.getOwnPropertyNames(something.stores).forEach((curr) => { %>
+          <option value="<%= curr %>"><%= something.stores[curr] %></option>
+        <% }) %>
+      </select>
+    </span>
+  </div>
 
-  <select class="sel_curr bitcoin_color">
-    <option value="btc">Bitcoin</option>
-    <option value="usd">USD</option>
-    <% Object.getOwnPropertyNames(something.stores).forEach((curr) => { %>
-      <option value="<%= curr %>"><%= something.stores[curr] %></option>
-    <% }) %>
-  </select>
-
-  <br />
-
-  today would get you <b><span class="thing_now_qty">⏳</span> <%= something.plural; %></b>
+  <div class="main-block">
+    <span class="inline-block">
+      today would get you
+    </span>
+    <span class="inline-block">
+      <b><span class="thing_now_qty">⏳</span> <%= something.plural; %></b>
+    </span>
+  </div>
 </section>
 
 <section class="chart">
