@@ -1,26 +1,50 @@
-<html>
+<!doctype html>
+<html lang="en">
 <head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title><%= something.icon; %> | Store of <%= something.plural; %></title>
+<title><%= something.website.title; %></title>
+<meta name="description" content="<%= something.website.description; %>" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:creator" content="<%= something.website.twitter.creator; %>">
+<meta name="twitter:site" content="<%= something.website.twitter.site; %>">
+<meta name="twitter:title" content="<%= something.website.title; %>" />
+<meta name="twitter:description" content="<%= something.website.description; %>" />
+<meta name="twitter:image" content="<%= something.website.rootUrl; %>assets/og-1200x628.png" />
+<meta property="og:title" content="<%= something.website.title; %>" />
+<meta property="og:description" content="<%= something.website.description; %>" />
+<meta property="og:url" content="<%= something.website.rootUrl; %>" />
+<meta property="og:image" content="<%= something.website.rootUrl; %>assets/og-1200x628.png" />
 <style>
-  .bitcoin_color {
-    color: #FF9900;
+  .bitcoin-color {
+    color: <%= something.colors.bitcoin %>;
   }
   .icon {
     font-size: 128px;
     line-height: 1;
-    margin:0;
-    position: relative;
+    margin: 0;
+  }
+  .logo {
+    text-align: center;
+  }
+  .logo > img {
+    width: 128px;
   }
   body {
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding:32px;
-    text-align:center;
+    background: <%= something.colors.background %>;
   }
   h1 {
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size:40px;
     font-weight:800;
+  }
+  header {
+    text-align:center;
+  }
+  .main {
+    text-align:center;
   }
   .main, .main select {
     font-size: 24px;
@@ -37,24 +61,26 @@
     display: inline-block;
   }
   select {
-    border:4px solid #5c9e31;
-    color: #5c9e31;
+    border:4px solid <%= something.colors.primary %>;
+    border-radius: 6px;
+    color: <%= something.colors.primary %>;
     cursor:pointer;
     opacity:0.78;
   }
-  .sel_curr {
-    color: #5c6c7c;
-    border-color: #5c6c7c;
+  .sel-curr {
+    color: <%= something.colors.secondary %>;
+    border-color: <%= something.colors.secondary %>;
   }
-  .sel_curr.bitcoin_color {
-    color: #FF9900;
-    border-color: #FF9900;
+  .sel-curr.bitcoin-color {
+    color: <%= something.colors.bitcoin %>;
+    border-color: <%= something.colors.bitcoin %>;
   }
   select:hover {
     opacity:1;
   }
   a {
-    color:#5c9e31;
+    color:<%= something.colors.primary %>;
+    font-weight: bold;
     opacity:0.8;
   }
   a:hover {
@@ -62,6 +88,19 @@
   }
   .chart {
     margin: 32px 0;
+  }
+
+  .info, .footer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    margin: -12px;
+  }
+
+  .info-block, .footer-block {
+    flex: 1;
+    margin: 12px;
   }
 
   @media (max-width: 600px) {
@@ -76,12 +115,28 @@
       margin: 16px 0;
     }
 	}
+
+  @media (max-width: 800px) {
+    .info, .footer {
+      flex-direction: column;
+    }
+  }
+
+  @media (min-width: 801px) {
+    .footer-block:last-child {
+      text-align: right;
+    }
+  }
 </style>
 </head>
 
 <body>
 <header>
-  <p class="icon"><%= something.icon; %></p>
+  <% if (!something.logo) { %>
+    <p class="icon"><%= something.icon; %></p>
+  <% } else { %>
+    <div class="logo"><img src="<%= something.logo; %>" alt="Logo" /></div>
+  <% } %>
   <h1>Store of <%= something.plural; %></h1>
 </header>
 
@@ -92,26 +147,26 @@
     <span class="inline-block"><b>1 <%= something.singular; %></b></span>
 
     <span class="inline-block">
-      in
-      <select class="sel_category">
+      <%= something.category.in %>
+      <select class="sel-category">
         <% Object.getOwnPropertyNames(thingPrices).sort().forEach((category) => { %>
-        <option value="<%= category %>"><%= category %></option>
+        <option value="<%= category %>"<%= (category === something.category.default ? " selected" : "") %>><%= category %></option>
         <% }) %>
       </select>
     </span>
 
     <span class="inline-block">
       in
-      <select class="sel_year">
-        <% for (let year = something.fromYear; year < (new Date()).getUTCFullYear(); year++) { %>
-        <option value="<%= year %>"><%= year %></option>
+      <select class="sel-year">
+        <% for (let year = something.year.from; year < (new Date()).getUTCFullYear(); year++) { %>
+        <option value="<%= year %>"<%= (year === something.year.default ? " selected" : "") %>><%= year %></option>
         <% } %>
       </select>
     </span>
 
     <span class="inline-block">
       stored in
-      <select class="sel_curr bitcoin_color">
+      <select class="sel-curr bitcoin-color">
         <option value="btc">Bitcoin</option>
         <option value="usd">USD</option>
         <% Object.getOwnPropertyNames(something.stores).forEach((curr) => { %>
@@ -123,10 +178,10 @@
 
   <div class="main-block">
     <span class="inline-block">
-      today would get you
+      today would get
     </span>
     <span class="inline-block">
-      <b><span class="thing_now_qty">⏳</span> <%= something.plural; %></b>
+      <b><span class="thing-now-qty">⏳</span> <%= something.plural; %></b>
     </span>
   </div>
 </section>
@@ -134,6 +189,33 @@
 <section class="chart">
 	<canvas id="chart" width="500" height="400"></canvas>
 </section>
+
+<section class="info">
+  <div class="info-block">
+    <h2>🧙 Open Source</h2>
+    <p>Found a bug or think the website is missing a feature? It is <a href="<%= something.repoLink %>" target="_blank">open source</a>, so feel free to contribute.</p>
+    <p>Have a price history dataset for something? Make your <a href="https://github.com/alexk111/store-of-something" target="_blank">Store of {Something}</a> website from it.</p>
+  </div>
+  <% if (something.credits && something.credits.length) { %>
+  <div class="info-block">
+    <h2>🙌 Credits</h2>
+    <% something.credits.forEach((item) => { %>
+    <p><%= item.what %> provided by <a href="<%= item.link %>" target="_blank"><%= item.providedBy %></a>.</p>
+    <% }) %>
+  </div>
+  <% } %>
+</section>
+
+<hr />
+
+<footer class="footer">
+  <div class="footer-block">
+    Made by <a href="<%= something.madeBy.link %>" target="_blank"><%= something.madeBy.idOrName %></a>, with <a href="https://github.com/alexk111/store-of-something" target="_blank">Store of {Something}</a>.
+  </div>
+  <div class="footer-block">
+    Last update: <%= new Date().toISOString().slice(0,10); %>
+  </div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha256-t9UJPrESBeG2ojKTIcFLPGF7nHi2vEc7f5A2KpH/UBU=" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
@@ -247,13 +329,13 @@
   });
 
 	$(function () {
-		$('.sel_category').on('change', function() {
+		$('.sel-category').on('change', function() {
       updateScreen();
     });
-		$('.sel_year').on('change', function() {
+		$('.sel-year').on('change', function() {
       updateScreen();
     });
-		$('.sel_curr').on('change', function() {
+		$('.sel-curr').on('change', function() {
       updateScreen();
     });
 
@@ -272,26 +354,26 @@
   }
 
   function updateScreen() {
-    const selCategory=$('.sel_category').val();
+    const selCategory=$('.sel-category').val();
 
     const thingTimePrice = arrThingTimePrice[selCategory];
     const minYear = new Date(thingTimePrice[0][0]).getUTCFullYear();
-    if ($('.sel_year').val()*1 < minYear) {
-      $('.sel_year').val(minYear);
+    if ($('.sel-year').val()*1 < minYear) {
+      $('.sel-year').val(minYear);
     }
-    $('.sel_year option').each(function () {
+    $('.sel-year option').each(function () {
       $(this).prop("disabled", $(this).val()*1 < minYear);
     });
 
-		const selYear=$('.sel_year').val();
-    const selCurr=$('.sel_curr').val();
+		const selYear=$('.sel-year').val();
+    const selCurr=$('.sel-curr').val();
 
     const selYearTimestamp = Date.UTC(selYear*1,0,1,0,0,0);
 
     if (selCurr==='btc') {
-      $('.sel_curr').addClass('bitcoin_color');
+      $('.sel-curr').addClass('bitcoin-color');
     } else {
-      $('.sel_curr').removeClass('bitcoin_color');
+      $('.sel-curr').removeClass('bitcoin-color');
     }
 
     const data = {
@@ -300,8 +382,8 @@
     };
 
     const dataset = {
-      backgroundColor: '#5c9e31',
-      borderColor: '#5c9e31',
+      backgroundColor: '<%= something.colors.primary %>',
+      borderColor: '<%= something.colors.primary %>',
       fill: false
     };
 
@@ -365,9 +447,9 @@
 
     if (dataset.data !== undefined) {
       data.datasets.push(dataset);
-      $('.thing_now_qty').text(toFormattedNum(dataset.data[dataset.data.length-1]));
+      $('.thing-now-qty').text(toFormattedNum(dataset.data[dataset.data.length-1]));
     } else {
-      $('.thing_now_qty').text('?');
+      $('.thing-now-qty').text('?');
     }
 
     chart.data = data;
@@ -375,8 +457,5 @@
   }
 </script>
 
-<p>
-  Updated on <%= new Date().toISOString().slice(0,10); %>
-</p>
 </body>
 </html>

@@ -44,7 +44,7 @@ async function loadThingPricesFromCSV(filePath) {
         const strDate = data["date"];
         const arrDate = strDateToArr(strDate);
 
-        if (arrDate[0] * 1 >= something.fromYear) {
+        if (arrDate[0] * 1 >= something.year.from) {
           const strCategory = data[something.csvColumnNames.category];
           const strPrice = data[something.csvColumnNames.usdPrice];
           if (thingPrices[strCategory] === undefined) {
