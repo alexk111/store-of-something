@@ -12,6 +12,7 @@
     "default": "United States"
   },
   "csvColumnNames": {
+    "date": "date",
     "category": "name",
     "usdPrice": "dollar_price"
   },

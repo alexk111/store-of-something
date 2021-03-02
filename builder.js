@@ -41,7 +41,7 @@ async function loadThingPricesFromCSV(filePath) {
       .createReadStream(filePath)
       .pipe(csv({}))
       .on("data", (data) => {
-        const strDate = data["date"];
+        const strDate = data[something.csvColumnNames.date];
         const arrDate = strDateToArr(strDate);
 
         if (arrDate[0] * 1 >= something.year.from) {
