@@ -19,17 +19,14 @@
     "xau": "Gold",
     "xag": "Silver"
   },
-  "credits": [
+  "dataSources": [
     {
       "what": "The Big Mac index data",
       "providedBy": "The Economist",
       "link": "https://github.com/TheEconomist/big-mac-data"
-    },
-    {
-      "what": "Bitcoin vs USD/XAU/XAG data",
-      "providedBy": "CoinGecko API",
-      "link": "https://www.coingecko.com/en/api"
-    },
+    }
+  ],
+  "credits": [
     {
       "what": "Hamburger pic",
       "providedBy": "OpenMoji",

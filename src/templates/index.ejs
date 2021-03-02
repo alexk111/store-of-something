@@ -127,6 +127,12 @@
       text-align: right;
     }
   }
+
+  @media (max-width: 1200px) {
+    .info-block {
+      flex-basis: 40%;
+    }
+  }
 </style>
 </head>
 
@@ -192,13 +198,22 @@
 
 <section class="info">
   <div class="info-block">
+    <h2>📈 Data</h2>
+    <% if (something.dataSources && something.dataSources.length) { %>
+    <%   something.dataSources.forEach((item) => { %>
+    <p><%= item.what %> provided by <a href="<%= item.link %>" target="_blank"><%= item.providedBy %></a>.</p>
+    <%   }) %>
+    <% } %>
+    <p>Bitcoin vs USD/XAU/XAG data provided by <a href="https://www.coingecko.com/en/api" target="_blank">CoinGecko API</a>.</p>
+  </div>
+  <div class="info-block">
     <h2>🧙 Open Source</h2>
     <p>Found a bug or think the website is missing a feature? It is <a href="<%= something.repoLink %>" target="_blank">open source</a>, so feel free to contribute.</p>
     <p>Have a price history dataset for something? Make your <a href="https://github.com/alexk111/store-of-something" target="_blank">Store of {Something}</a> website from it.</p>
   </div>
   <% if (something.credits && something.credits.length) { %>
   <div class="info-block">
-    <h2>🙌 Credits</h2>
+    <h2>🙏 Other Credits</h2>
     <% something.credits.forEach((item) => { %>
     <p><%= item.what %> provided by <a href="<%= item.link %>" target="_blank"><%= item.providedBy %></a>.</p>
     <% }) %>
