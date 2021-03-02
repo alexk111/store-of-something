@@ -16,6 +16,7 @@ This is a template repository for making "Store of {Something}" websites.
 ```
 store-of-something/
  └──src/                             * source files of the website
+     │
      ├──assets/                      * folder for image files
      │   ├──logo.svg                 * logo picture
      │   └──og-1200x628.png          * image for social networks
